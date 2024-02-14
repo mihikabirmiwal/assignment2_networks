@@ -1,0 +1,7 @@
+# p4c --p4runtime-files /shared/l2_basic_forwarding.p4info.txt /shared/l2_basic_forwarding.p4
+#simple_switch_grpc -i 1@eth0 -i 2@eth1 -i 3@eth2 -i 4@eth3 --no-p4 --thrift-port 9090  -- --grpc-server-addr 127.0.0.1:50051 --cpu-port 100 &
+
+#while [[ $(pgrep simple_switch_g) -eq 0 ]]; do sleep 1; done
+
+#until simple_switch_CLI <<< "help"; do sleep 1; done
+#simple_switch_CLI <<< $(cat commands.txt)
