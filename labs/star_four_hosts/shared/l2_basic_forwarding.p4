@@ -86,7 +86,7 @@ control MyIngress(inout headers hdr,
         support_timeout = true;
     }
 
-    /* check if the port=>mac mapping exists */
+    /* check if the mac address to port mapping exists */
     table smac_table{
         /* TODO: define key, actions, and default action for the table */  
         size = 4;
