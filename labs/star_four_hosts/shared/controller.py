@@ -102,7 +102,7 @@ def main(p4info_file_path, bmv2_file_path):
                     print("Deleted table entry")
                     print("Table_id: ", table_entry.table_id) 
         
-      except KeyboardInterrupt:
+    except KeyboardInterrupt:
         print(" Shutting down.")
     except grpc.RpcError as e:
         printGrpcError(e)

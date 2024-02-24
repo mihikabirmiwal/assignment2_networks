@@ -19,7 +19,7 @@ header ethernet_t {
 struct mac_learn_digest_t {
     /* TODO */ 
     macAddr_t addr;
-    int port;
+    bit<16> port;
 }
 
 struct metadata {
