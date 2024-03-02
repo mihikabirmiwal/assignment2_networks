@@ -19,6 +19,7 @@ from queue import Queue
 import grpc
 from p4.tmp import p4config_pb2
 from p4.v1 import p4runtime_pb2, p4runtime_pb2_grpc
+from .error_utils import printGrpcError
 
 MSG_LOG_MAX_LEN = 1024
 
@@ -96,7 +97,11 @@ class SwitchConnection(object):
         if dry_run:
             print("P4Runtime Write:", request)
         else:
-            self.client_stub.Write(request)
+            try: 
+                self.client_stub.Write(request)
+            except grpc.RpcError as e:
+                print ("The table entry might be sent to the switch before but not updated yet.")
+                printGrpcError(e)
             
     def DeleteTableEntry(self, table_entry, dry_run=False):
         request = p4runtime_pb2.WriteRequest()

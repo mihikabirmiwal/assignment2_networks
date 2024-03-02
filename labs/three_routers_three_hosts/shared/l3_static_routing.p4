@@ -10,11 +10,26 @@ typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
 header ethernet_t {
     /* TODO: define Ethernet header */ 
+    bit<64> preamble;
+    macAddr_t dest_macAddr;
+    macAddr_t source_macAddr;
+    bit<16> type;
 }
 
 /* a basic ip header without options and pad */
 header ipv4_t {
     /* TODO: define IP header */ 
+    bit<4> version;
+    bit<4> hlen;
+    bit<8> tos;
+    bit<16> len;
+    bit<16> id;
+    bit<16> flags;
+    bit<8> ttl;
+    bit<8> protocol;
+    bit<16> checksum;
+    ipAddr_t src_ipAddr;
+    ipAddr_t dst_ipAddr;
 }
 
 struct metadata {
@@ -46,6 +61,11 @@ parser MyParser(packet_in packet,
     state parse_ethernet {
         /* TODO: do ethernet header parsing */
         /* if the frame type is IPv4, go to IPv4 parsing */ 
+        if (hdr.ethernet.type == ETHER_IPV4) {
+            transition parse_ipv4;
+        }
+        packet.extract(hdr.ethernet);
+        transition accept;
     }
 
     state parse_ipv4 {
@@ -63,6 +83,20 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
     apply {
         /* TODO: verify checksum using verify_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */ 
+        apply {
+          verify_checksum(true,
+              /* A tuple is enclosed in curly brackets*/
+              { hdr.ipv4.version,
+                  hdr.ipv4.hlen,
+                  hdr.ipv4.flags,
+                  hdr.ipv4.id,
+                  hdr.ipv4.len,
+                  hdr.ipv4.src_ipAddr,
+                  hdr.ipv4.dst_ipAddr
+              },
+              hdr.ipv4.checksum, 
+              HashAlgorithm.csum16);
+      }
     }
 }
 
@@ -87,6 +121,7 @@ control MyIngress(inout headers hdr,
    
     action decrement_ttl() {
         /* TODO: decrement the IPv4 header's TTL field by one */
+        hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
 
     action forward_to_next_hop(ipAddr_t next_hop){
@@ -150,6 +185,20 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
         /* TODO: calculate the modified packet's checksum */
         /* using update_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */
+        apply {
+          update_checksum(true,
+              /* A tuple is enclosed in curly brackets*/
+              { hdr.ipv4.ver,
+                  hdr.ipv4.hlen,
+                  hdr.ipv4.flags,
+                  hdr.ipv4.id,
+                  hdr.ipv4.len,
+                  hdr.ipv4.src_ipAddr,
+                  hdr.ipv4.dst_ipAddr
+              },
+              hdr.ipv4.checksum, 
+              HashAlgorithm.csum16);
+      }
     } 
 }
 
