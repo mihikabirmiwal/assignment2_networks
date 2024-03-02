@@ -9,7 +9,6 @@
 typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
 header ethernet_t {
-    /* TODO: define Ethernet header */ 
     bit<64> preamble;
     macAddr_t dest_macAddr;
     macAddr_t source_macAddr;
@@ -18,7 +17,6 @@ header ethernet_t {
 
 /* a basic ip header without options and pad */
 header ipv4_t {
-    /* TODO: define IP header */ 
     bit<4> version;
     bit<4> hlen;
     bit<8> tos;
@@ -59,7 +57,6 @@ parser MyParser(packet_in packet,
         transition parse_ethernet;
     }
     state parse_ethernet {
-        /* TODO: do ethernet header parsing */
         /* if the frame type is IPv4, go to IPv4 parsing */ 
         if (hdr.ethernet.type == ETHER_IPV4) {
             transition parse_ipv4;
@@ -81,7 +78,6 @@ parser MyParser(packet_in packet,
 
 control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
     apply {
-        /* TODO: verify checksum using verify_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */ 
         apply {
           verify_checksum(true,
@@ -115,52 +111,89 @@ control MyIngress(inout headers hdr,
     }
 
     action forward_to_port(bit<9> egress_port, macAddr_t egress_mac) {
-        /* TODO: change the packet's source MAC address to egress_mac */
+        /* change the packet's source MAC address to egress_mac */
         /* Then set the egress port in the packet's standard_metadata to egress_port */
+        hdr.ethernet.source_macAddr = egress_mac;
+        standard_metadata.egress_spec = egress_port;
+
     }
    
     action decrement_ttl() {
-        /* TODO: decrement the IPv4 header's TTL field by one */
+        /* decrement the IPv4 header's TTL field by one */
         hdr.ipv4.ttl = hdr.ipv4.ttl - 1;
     }
 
     action forward_to_next_hop(ipAddr_t next_hop){
-        /* TODO: write next_hop to metadata's next_hop field */
+        /* write next_hop to metadata's next_hop field */
+        meta.next_hop = next_hop;
     }
 
     action change_dst_mac (macAddr_t dst_mac) {
-        /* TODO: change a packet's destination MAC address to dst_mac*/
+        /* change a packet's destination MAC address to dst_mac*/
+        hdr.ethernet.dest_macAddr = dst_mac;
     }
 
     /* define routing table */
     table ipv4_route {
-        /* TODO: define a static ipv4 routing table */
+        /* define a static ipv4 routing table */
         /* Perform longest prefix matching on dstIP then */
         /* record the next hop IP address in the metadata's next_hop field*/
+
+        key = {
+            hdr.ipv4.dst_ipAddr: lpm;
+        }
+
+        actions = {
+            forward_to_next_hop;
+            drop;
+        }
+
     }
 
     /* define static ARP table */
     table arp_table {
-        /* TODO: define a static ARP table */
+        /* define a static ARP table */
         /* Perform exact matching on metadata's next_hop field then */
         /* modify the packet's src and dst MAC addresses upon match */
+
+        key = {
+            meta.next_hop: exact;
+        }
+
+        actions = {
+            change_dst_mac;
+            drop;
+        }
     }
 
 
     /* define forwarding table */
     table dmac_forward {
-        /* TODO: define a static forwarding table */
+        /* define a static forwarding table */
         /* Perform exact matching on dstMAC then */
         /* forward to the corresponding egress port */ 
+
+        key = {
+            hdr.ethernet.dest_macAddr: exact;
+        }
+
+        actions = {
+            forward_to_port;
+            drop;
+        }
     }
    
     /* applying dmac */
     apply {
-        /* TODO: Implement a routing logic */
+        /* Implement a routing logic */
         /* 1. Lookup IPv4 routing table */
+        ipv4_route.apply();
         /* 2. Upon hit, lookup ARP table */
+        arp_table.apply();
         /* 3. Upon hit, Decrement ttl */
+        decrement_ttl();
         /* 4. Then lookup forwarding table */  
+        dmac_forward.apply();
     }
 }
 
@@ -182,13 +215,13 @@ control MyEgress(inout headers hdr,
 
 control MyComputeChecksum(inout headers hdr, inout metadata meta) {
     apply {
-        /* TODO: calculate the modified packet's checksum */
+        /* calculate the modified packet's checksum */
         /* using update_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */
         apply {
           update_checksum(true,
               /* A tuple is enclosed in curly brackets*/
-              { hdr.ipv4.ver,
+              { hdr.ipv4.version,
                   hdr.ipv4.hlen,
                   hdr.ipv4.flags,
                   hdr.ipv4.id,
