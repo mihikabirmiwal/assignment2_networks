@@ -119,8 +119,8 @@ def main(p4info_file_path, bmv2_file_path, routing_info):
                 s1.WriteTableEntry(mac_table_entry)
 
         print_table_entries("MyIngress.ipv4_route")
-        print_table_entries("MyIngress.arp_table_entry")
-        print_table_entries("MyIngress.mac_table_entry")
+        print_table_entries("MyIngress.arp_table")
+        print_table_entries("MyIngress.dmac_forward")
     
     except KeyboardInterrupt:
         print(" Shutting down.")
