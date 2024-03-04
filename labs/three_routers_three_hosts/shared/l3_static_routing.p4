@@ -9,7 +9,6 @@
 typedef bit<48> macAddr_t;
 typedef bit<32> ipAddr_t;
 header ethernet_t {
-    bit<64> preamble;
     macAddr_t dest_macAddr;
     macAddr_t source_macAddr;
     bit<16> type;
