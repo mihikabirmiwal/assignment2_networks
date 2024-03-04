@@ -83,9 +83,12 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
               /* A tuple is enclosed in curly brackets*/
               { hdr.ipv4.version,
                   hdr.ipv4.hlen,
-                  hdr.ipv4.flags,
-                  hdr.ipv4.id,
+                  hdr.ipv4.tos,
                   hdr.ipv4.len,
+                  hdr.ipv4.id,
+                  hdr.ipv4.flags,
+                  hdr.ipv4.ttl,
+                  hdr.ipv4.protocol,
                   hdr.ipv4.src_ipAddr,
                   hdr.ipv4.dst_ipAddr
               },
@@ -220,9 +223,12 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
               /* A tuple is enclosed in curly brackets*/
               { hdr.ipv4.version,
                   hdr.ipv4.hlen,
-                  hdr.ipv4.flags,
-                  hdr.ipv4.id,
+                  hdr.ipv4.tos,
                   hdr.ipv4.len,
+                  hdr.ipv4.id,
+                  hdr.ipv4.flags,
+                  hdr.ipv4.ttl,
+                  hdr.ipv4.protocol,
                   hdr.ipv4.src_ipAddr,
                   hdr.ipv4.dst_ipAddr
               },
