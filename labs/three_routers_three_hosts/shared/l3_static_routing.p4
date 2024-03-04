@@ -58,11 +58,11 @@ parser MyParser(packet_in packet,
     }
     state parse_ethernet {
         /* if the frame type is IPv4, go to IPv4 parsing */ 
-        if (hdr.ethernet.type == ETHER_IPV4) {
-            transition parse_ipv4;
-        }
         packet.extract(hdr.ethernet);
-        transition accept;
+        transition select(hdr.ethernet.type) {
+            ETHER_IPV4: parse_ipv4;
+            default: accept;
+        }
     }
 
     state parse_ipv4 {
@@ -77,7 +77,6 @@ parser MyParser(packet_in packet,
 *************************************************************************/
 
 control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
-    apply {
         /* Use HashAlgorithm.csum16 as a hash algorithm */ 
         apply {
           verify_checksum(true,
@@ -93,7 +92,6 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
               hdr.ipv4.checksum, 
               HashAlgorithm.csum16);
       }
-    }
 }
 
 
@@ -214,7 +212,6 @@ control MyEgress(inout headers hdr,
 *************************************************************************/
 
 control MyComputeChecksum(inout headers hdr, inout metadata meta) {
-    apply {
         /* calculate the modified packet's checksum */
         /* using update_checksum() extern */
         /* Use HashAlgorithm.csum16 as a hash algorithm */
@@ -232,7 +229,6 @@ control MyComputeChecksum(inout headers hdr, inout metadata meta) {
               hdr.ipv4.checksum, 
               HashAlgorithm.csum16);
       }
-    } 
 }
 
 
