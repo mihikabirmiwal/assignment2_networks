@@ -138,7 +138,7 @@ control MyIngress(inout headers hdr,
         /* record the next hop IP address in the metadata's next_hop field*/
 
         key = {
-            hdr.ipv4.src_ipAddr: lpm;
+            hdr.ipv4.dst_ipAddr: lpm;
         }
 
         actions = {
