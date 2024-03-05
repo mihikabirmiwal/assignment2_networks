@@ -68,6 +68,10 @@ control MyIngress(inout headers hdr,
         mark_to_drop(standard_metadata);
     }
 
+    action NoAction() {
+        
+    }
+
     action forward_to_port(bit<9> egress_port) {
         standard_metadata.egress_spec = egress_port;
     }
