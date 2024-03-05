@@ -89,7 +89,8 @@ def main(p4info_file_path, bmv2_file_path):
                 table_entry_learning = p4info_helper.buildTableEntry(
                     table_name="MyIngress.smac_table",
                     match_fields={"hdr.ethernet.source_macAddr": eth_src_addr},
-                    action_name="MyIngress.NoAction",
+                    action_name="NoAction",
+                    action_params={}
                 )
                 table_entry_learning.idle_timeout_ns = int(5 * 1e9) # timeout is 1 second
                 s1.WriteTableEntry(table_entry_learning)
