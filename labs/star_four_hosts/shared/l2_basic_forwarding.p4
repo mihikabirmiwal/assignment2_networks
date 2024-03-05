@@ -9,7 +9,6 @@
 typedef bit<48> macAddr_t;
 header ethernet_t {
     /* TODO: Define ethernet header*/ 
-    bit<64> preamble;
     macAddr_t dest_macAddr;
     macAddr_t source_macAddr;
     bit<16> type;
@@ -69,7 +68,7 @@ control MyIngress(inout headers hdr,
     }
 
     action NoAction() {
-        
+
     }
 
     action forward_to_port(bit<9> egress_port) {

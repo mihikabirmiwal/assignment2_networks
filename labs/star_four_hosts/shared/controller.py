@@ -83,7 +83,7 @@ def main(p4info_file_path, bmv2_file_path):
                     action_name="MyIngress.forward_to_port",
                     action_params={"egress_port": port_id}
                 )
-                table_entry_forwarding.idle_timeout_ns = int(1 * 1e9) # timeout is 1 second
+                # table_entry_forwarding.idle_timeout_ns = int(1 * 1e9) # timeout is 1 second
                 s1.WriteTableEntry(table_entry_forwarding)
 
                 table_entry_learning = p4info_helper.buildTableEntry(
@@ -91,7 +91,7 @@ def main(p4info_file_path, bmv2_file_path):
                     match_fields={"hdr.ethernet.source_macAddr": eth_src_addr},
                     action_name="MyIngress.NoAction",
                 )
-                table_entry_learning.idle_timeout_ns = int(1 * 1e9) # timeout is 1 second
+                # table_entry_learning.idle_timeout_ns = int(1 * 1e9) # timeout is 1 second
                 s1.WriteTableEntry(table_entry_learning)
 
             elif (digest_type == 'idle_timeout_notification'):
